@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قلمي للطباعة والتصميم - التحكم الكامل بالحاسبة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+    <style id="custom-theme-styles">
+        :root {
+            --card-bg: rgba(30, 41, 59, 0.75); 
+            --primary-color: #06b6d4;
+            --accent-color: #f97316;
+            --text-color: #f8fafc;
+            --border-color: rgba(51, 65, 85, 0.5);
+        }
+    </style>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        
+        body { 
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; 
+            animation: fullSiteBackgroundMove 25s infinite alternate ease-in-out;
+            color: var(--text-color); 
+            line-height: 1.7; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8); 
+            z-index: -1;
+        }
+
+        @keyframes fullSiteBackgroundMove {
+            0% { background-position: 0% 50%; background-size: 100%; }
+            50% { background-position: 100% 50%; background-size: 115%; }
+            100% { background-position: 50% 100%; background-size: 100%; }
+        }
+        
+        nav { background-color: rgba(30, 41, 59, 0.85); backdrop-filter: blur(8px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); position: relative; z-index: 1000; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        nav .logo-container { display: flex; align-items: center; cursor: pointer; user-select: none; }
+        nav .logo-text { font-size: 1.6rem; font-weight: 700; color: var(--primary-color); }
+        nav .nav-links { display: flex; flex-wrap: wrap; gap: 10px; }
+        nav .nav-links a { text-decoration: none; color: var(--text-color); font-weight: 600; cursor: pointer; transition: 0.3s; padding: 8px 16px; border-radius: 20px; display: inline-block; }
+        nav .nav-links a:hover { color: var(--primary-color); background-color: var(--border-color); }
+        
+        .container { flex: 1; padding: 40px 20px; width: 100%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        
+        .home-header { text-align: center; padding: 40px 20px 60px 20px; margin-bottom: 30px; }
+        .home-header h1 { font-size: 3rem; color: #fff; margin-bottom: 15px; font-weight: 700; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .home-header p { font-size: 1.2rem; color: #e2e8f0; max-width: 700px; margin: 0 auto; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        /* لوحة التحكم */
+        .dev-controls { display: none; text-align: center; margin-bottom: 40px; background: rgba(28, 37, 65, 0.95); backdrop-filter: blur(10px); padding: 25px; border-radius: 16px; border: 2px dashed var(--accent-color); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .dev-controls h3 { margin-bottom: 15px; color: var(--accent-color); font-size: 1.2rem; }
+        .btn-dev { color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 0.95rem; margin: 6px; transition: all 0.2s; font-family: 'Cairo', sans-serif; }
+        .btn-dev:hover { transform: translateY(-2px); }
+
+        .dev-manager-section { background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(249, 115, 22, 0.3); }
+        .dev-manager-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
+
+        /* أداة التخصيص العائمة */
+        #floating-editor {
+            display: none; position: absolute; background: #1e293b; border: 2px solid var(--accent-color);
+            padding: 12px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 9999; gap: 12px; align-items: center; flex-wrap: wrap; direction: ltr;
+        }
+        #floating-editor label { color: white; font-size: 0.8rem; margin: 0; font-family: 'Cairo'; }
+        #floating-editor input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 5px; cursor: pointer; }
+        #floating-editor input[type="number"] { width: 50px; padding: 3px; border-radius: 4px; border: 1px solid #475569; background: #0f172a; color: white; text-align: center; }
+        .btn-transparent { background: #475569; color: white; border: 1px solid #64748b; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; cursor: pointer; font-family: 'Cairo'; }
+        .close-editor { background: #ef4444; color: white; border: none; border-radius: 5px; padding: 2px 8px; cursor: pointer; font-weight: bold; }
+
+        /* النوافذ المنبثقة */
+        .custom-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .popup-content { background: var(--card-bg); border: 2px solid var(--border-color); padding: 30px; border-radius: 20px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; }
+        .popup-close { position: absolute; top: 15px; left: 15px; background: #ef4444; color: white; border: none; border-radius: 5px; padding: 4px 10px; cursor: pointer; font-weight: bold; }
+        
+        .social-links-container { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; color: white; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
+        .social-btn.whatsapp { background-color: #25d366; }
+        .social-btn.telegram { background-color: #0088cc; }
+        .social-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        
+        .address-text { font-size: 1.2rem; color: #f8fafc; line-height: 1.8; margin-top: 10px; white-space: pre-line; }
+
+        /* معرض الملازم */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; width: 100%; margin-top: 20px; }
+        .image-card { background: var(--card-bg); backdrop-filter: blur(5px); padding: 20px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); text-align: center; position: relative; cursor: pointer; transition: all 0.3s ease; border: 1px solid var(--border-color); }
+        .image-card:hover { transform: translateY(-6px); border-color: var(--primary-color); }
+        .image-card img { width: 100%; height: 190px; object-fit: cover; border-radius: 12px; }
+        .change-img-btn { display: none; background: var(--accent-color); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-top: 12px; width: 100%; font-weight: bold; font-family: 'Cairo'; }
+        .delete-card-btn { display: none; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; position: absolute; top: -12px; left: -12px; font-weight: bold; z-index: 10; cursor: pointer; }
+
+        /* حاسبة الملازم الديناميكية بالكامل */
+        .calculator-view { display: none; max-width: 800px; width: 100%; margin: 0 auto; }
+        .section-card { background: var(--card-bg); backdrop-filter: blur(10px); padding: 35px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-top: 5px solid var(--accent-color); border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .section-card h2 { margin-bottom: 25px; text-align: center; font-weight: 700; }
+        
+        .form-group { margin-bottom: 22px; text-align: right; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 1rem; color: var(--text-color); background-color: rgba(15, 23, 42, 0.6); font-family: 'Cairo'; }
+        
+        .radio-group { display: flex; gap: 20px; margin-top: 5px; }
+        .radio-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+        .result-box { background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; margin-top: 25px; border: 1px solid var(--border-color); }
+        .result-box .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
+        .result-box .result-item:last-child { border-bottom: none; font-weight: 700; font-size: 1.35rem; padding-top: 15px; color: var(--primary-color); }
+        .btn-back { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-color); padding: 10px 24px; border-radius: 30px; cursor: pointer; margin-bottom: 25px; font-weight: 600; font-family: 'Cairo'; }
+
+        /* واجهة التفاصيل */
+        .details-view { display: none; max-width: 900px; width: 100%; margin: 0 auto; }
+        .details-container { display: flex; flex-direction: row; gap: 40px; background: var(--card-bg); backdrop-filter: blur(10px); padding: 35px; border-radius: 16px; border: 1px solid var(--border-color); }
+        .details-media { flex: 1; text-align: center; }
+        .details-media img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 12px; }
+        .details-info { flex: 1; display: flex; flex-direction: column; text-align: right; }
+        
+        .btn-action { text-decoration: none; color: white; padding: 14px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
+        .btn-whatsapp { background-color: #14532d; border: 1px solid #22c55e; color: #22c55e; }
+        .btn-cod { background-color: var(--accent-color); border: none; }
+        .cod-order-section { display: none; margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 30px; }
+        .btn-submit-order { background: var(--primary-color); color: white; width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 1.15rem; font-weight: bold; cursor: pointer; }
+
+        @media (max-width: 768px) { .details-container { flex-direction: column; } nav { padding: 15px 20px; } }
+        footer { text-align: center; padding: 25px; background-color: rgba(30, 41, 59, 0.85); border-top: 1px solid var(--border-color); margin-top: auto; position: relative; z-index: 2; }
+    </style>
+</head>
+<body id="main-body" class="" style="background-image: url(&quot;file:///C:/Users/hp/OneDrive/%D8%A7%D9%84%D8%B5%D9%88%D8%B1/WhatsApp%20Image%202026-07-04%20at%206.09.55%20PM.jpg.jpeg&quot;);">
+
+    <!-- أداة التخصيص اللحظية الفورية -->
+    <div id="floating-editor" style="display: none; top: -39.85px; left: 406.163px;">
+        <div>
+            <label>اللون:</label>
+            <input type="color" id="editor-color" oninput="applyActiveElementStyle('color', this.value)">
+        </div>
+        <div>
+            <label>الخلفية:</label>
+            <input type="color" id="editor-bg" oninput="applyActiveElementStyle('backgroundColor', this.value)">
+            <button class="btn-transparent" onclick="applyActiveElementStyle('backgroundColor', 'transparent')">شفافة ⚪</button>
+        </div>
+        <div>
+            <label>الحجم (px):</label>
+            <input type="number" id="editor-size" min="10" max="100" oninput="applyActiveElementStyle('fontSize', this.value + 'px')">
+        </div>
+        <button class="close-editor" onclick="closeFloatingEditor()">✕</button>
+    </div>
+
+    <!-- نوافذ الاتصال والعناوين -->
+    <div id="popup-contact" class="custom-popup" onclick="closePopup('popup-contact')" style="display: none;">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <button class="popup-close" onclick="closePopup('popup-contact')">✕</button>
+            <h3>📞 تواصل معنا</h3>
+            <div class="social-links-container">
+                <a id="link-whatsapp" href="https://wa.me/9647733806611" target="_blank" class="social-btn whatsapp">💬 واتساب</a>
+                <a id="link-telegram" href="t.me/YOUSIIF_ALI" target="_blank" class="social-btn telegram">✈️ تلغرام</a>
+                <a id="link-instagram" href="https://www.instagram.com/qalami_designs?igsh=MTdiZHM2OW0weTZ1ZQ==" target="_blank" class="social-btn instagram">📸 انستغرام</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup-address" class="custom-popup" onclick="closePopup('popup-address')" style="display: none;">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <button class="popup-close" onclick="closePopup('popup-address')">✕</button>
+            <h3>📍 عنوان المكتب</h3>
+            <div id="display-address-text" class="address-text">كركوك حي العسكري سايدين المعراج</div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="logo-container" onclick="handleLogoClick()">
+            <div id="logo-text" class="logo-text editable" contenteditable="false">قلمي 🖋️</div>
+        </div>
+        <div class="nav-links">
+            <a id="nav-contact-text" class="editable" onclick="openPopup('popup-contact')" contenteditable="false">📞 تواصل معنا</a>
+            <a id="nav-address-text" class="editable" onclick="openPopup('popup-address')" contenteditable="false">📍 عنواننا</a>
+            <a id="nav-home-text" class="editable" onclick="showHome()" contenteditable="false">الرئيسية</a>
+            <a id="nav-calc-text" class="editable" onclick="showCalculator()" contenteditable="false">📊 احسب ملزمتك</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- الواجهة الرئيسية -->
+        <div id="home-view" style="display: block;">
+            <div class="home-header" id="main-home-header">
+                <h1 id="edit-title" class="editable" contenteditable="false">قلمي للطباعة والتصميم</h1>
+                <p id="edit-desc" class="editable" contenteditable="false">مرحباً بك في متجرنا الإلكتروني. تصفح الملازم المتوفرة أو اصنع قوائم حاسبتك الخاصة بالكامل فورا.</p>
+            </div>
+            
+            <!-- لوحة التحكم الاحترافية للمطور (شاملة التحكم الكامل بالحاسبة) -->
+            <div class="dev-controls" id="dev-controls" style="display: none;">
+                <h3>🛠️ لوحة التحكم المطلقة لـ استوديو قلمي</h3>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">💡 اضغط على أي نص لتعديله فوراً، وتحكم بشكل كامل بقوائم وأسعار الحاسبة من القسم أدناه.</p>
+                
+                <button class="btn-dev" style="background-color: #25d366;" onclick="devEditSocialLinks()">🔗 تعديل روابط السوشيال ميديا</button>
+                <button class="btn-dev" style="background-color: #3b82f6;" onclick="devEditAddress()">📍 تعديل نص العنوان الحالي</button>
+                <button class="btn-dev" style="background-color: #f59e0b;" onclick="changeFullSiteBackgroundImage()">🖼️ تغيير خلفية الموقع</button>
+                <button class="btn-dev" style="background-color: #10b981;" onclick="addNewProductFast()">➕ إضافة نموذج ملزمة جديدة</button>
+
+                <!-- قسم الإدارة المطلقة والكاملة للحاسبة -->
+                <div class="dev-manager-section">
+                    <h4 style="color: #f97316; margin-bottom: 10px;">📊 التحكم الكامل والشامل بقوائم الحاسبة (إضافة / حذف / تعديل)</h4>
+                    <button class="btn-dev" style="background-color: #06b6d4;" onclick="createNewCalculatorMenu()">➕ إنشاء قائمة خيارات جديدة تماماً</button>
+                    <button class="btn-dev" style="background-color: #ef4444;" onclick="deleteCalculatorMenu()">🗑️ حذف قائمة بالكامل</button>
+                    
+                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+                    <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 5px;">👇 اختر أي قائمة لـ (إضافة خيار أو تعديل أو مسح خيار بداخلها):</p>
+                    <div class="dev-manager-grid" id="dev-menus-buttons-container"><button class="btn-dev" style="background: rgb(30, 41, 59); border: 1px solid rgb(71, 85, 105);">⚙️ إدارة: نوع الطباعة</button><button class="btn-dev" style="background: rgb(30, 41, 59); border: 1px solid rgb(71, 85, 105);">⚙️ إدارة: نوع التجميع</button><button class="btn-dev" style="background: rgb(30, 41, 59); border: 1px solid rgb(71, 85, 105);">⚙️ إدارة: نوع الغلاف</button></div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
+                <button class="btn-dev" style="background-color: var(--accent-color); border: 2px solid white;" onclick="downloadUpdatedHTML()">📥 تحميل ملف الـ HTML بعد التعديلات وحفظه كلياً</button>
+                <button class="btn-dev" style="background-color: #64748b;" onclick="exitEditMode()">🔒 قفل وضع المطور</button>
+            </div>
+
+            <div class="gallery-grid" id="gallery-grid"><div class="no-items-msg">الموقع جاهز للتصميم 🖋️ اضغط 3 مرات على "قلمي" لفتح الإعدادات وصنع الحاسبة والأسعار.</div></div>
+        </div>
+
+        <!-- حاسبة الملازم الذكية -->
+        <div id="calculator-view" class="calculator-view" style="display: none;">
+            <button class="btn-back" onclick="showHome()">← العودة للرئيسية</button>
+            <section class="section-card">
+                <h2>🖩 حاسبة الملازم الذكية والشاملة</h2>
+                
+                <div class="form-group">
+                    <label for="page-count">عدد صفحات الملزمة الواحدة:</label>
+                    <input type="number" id="page-count" value="100" oninput="calculateTotal()">
+                </div>
+
+                <div class="form-group">
+                    <label>طريقة احتساب صفحات الورق:</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="page-face" value="1" checked="" onchange="calculateTotal()"> احتساب كل صفحة كورقة منفصلة (سنجل)</label>
+                        <label class="radio-label"><input type="radio" name="page-face" value="2" onchange="calculateTotal()"> احتساب كل صفحتين في ورقة واحدة (وجهين / دوبلكس)</label>
+                    </div>
+                </div>
+
+                <!-- هنا تنزل القوائم والخيارات اللي تصنعها بنفسك بالكامل تلقائياً -->
+                <div id="dynamic-calculator-fields-container"><div class="form-group"><label>نوع الطباعة:</label><select id="calc-select-نوع_الطباعة" data-menu-id="نوع_الطباعة"><option value="0" data-per-page="false">خيار افتراضي مجاني (0 دينار)</option><option value="35دينار" data-per-page="true">ديجيتال (35 دينار للوجة/الورقة)</option><option value="75 دينار" data-per-page="true">ليزري (75 دينار للوجة/الورقة)</option><option value="130 دينار" data-per-page="true">زيتي (130 دينار للوجة/الورقة)</option></select></div><div class="form-group"><label>نوع التجميع:</label><select id="calc-select-نوع_التجميع" data-menu-id="نوع_التجميع"><option value="0" data-per-page="false">خيار افتراضي مجاني (0 دينار)</option><option value="مجانا" data-per-page="true">كبس (NaN دينار للوجة/الورقة)</option><option value="550 دينار" data-per-page="false">سبايرول (550 دينار ثابت)</option><option value="500 دينار" data-per-page="false">تجليد حراري (500 دينار ثابت)</option></select></div><div class="form-group"><label>نوع الغلاف:</label><select id="calc-select-نوع_الغلاف" data-menu-id="نوع_الغلاف"><option value="0" data-per-page="false">خيار افتراضي مجاني (0 دينار)</option><option value="500 دينار" data-per-page="false">ورق مات 180 غرام (500 دينار ثابت)</option><option value="650 دينار" data-per-page="false">ورق مات 250 غرام (650 دينار ثابت)</option><option value="950 دينار" data-per-page="false">ورق مات  300 غرام (950 دينار ثابت)</option><option value="550 دينار" data-per-page="false">ورق غلوسي 180 غرام (550 دينار ثابت)</option><option value="750 دينار" data-per-page="false">ورق غلوسي 250 غرام (750 دينار ثابت)</option><option value="1100 دينار" data-per-page="false">ورق غلوسي 300 غرام (1,100 دينار ثابت)</option><option value="700 دينار" data-per-page="false">ورق مسلفن 180 غرام (700 دينار ثابت)</option><option value="850 دينار" data-per-page="false">ورق مسلفن 250 غرام (850 دينار ثابت)</option><option value="1750 دينار" data-per-page="false">ورق مسلفن 300 غرام (1,750 دينار ثابت)</option></select></div></div>
+                
+                <div class="form-group">
+                    <label for="book-count">عدد الملازم (الكمية المطلوبة):</label>
+                    <input type="number" id="book-count" value="1" oninput="calculateTotal()">
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-item"><span>عدد الأوراق الفعلي المحسوب:</span><strong id="calculated-papers-count">50 ورقة</strong></div>
+                    <div class="result-item"><span>تكلفة الملزمة الواحدة شاملة اختياراتك:</span><strong id="single-total-cost">0 دينار</strong></div>
+                    <div class="result-item"><span>السعر الإجمالي النهائي للطلب بالكامل:</span><strong id="final-total-cost">0 دينار</strong></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- واجهة تفاصيل السلعة -->
+        <div id="details-view" class="details-view" style="display: none;">
+            <button class="btn-back" onclick="showHome()">← العودة للرئيسية</button>
+            <div class="details-container">
+                <div class="details-media"><img id="view-img" src="" alt="صورة النموذج"></div>
+                <div class="details-info">
+                    <h2 id="view-title">اسم النموذج</h2>
+                    <p id="view-teacher" style="font-size: 1.1rem; margin: 10px 0;">الأستاذ: </p>
+                    <p id="view-price" style="font-weight: bold; color: var(--accent-color); font-size: 1.3rem;">السعر: </p>
+                    <a id="view-whatsapp-btn" class="btn-action btn-whatsapp" href="" target="_blank">💬 استفسار عبر الواتساب</a>
+                    <button class="btn-action btn-cod" onclick="showCodSection()">🚚 حجز وتوصيل للمنزل</button>
+
+                    <div class="cod-order-section" id="cod-order-section">
+                        <h3>📦 استمارة حجز التوصيل</h3>
+                        <form onsubmit="submitCodForm(event)">
+                            <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="form-name" required=""></div>
+                            <div class="form-group"><label>رقم هاتف:</label><input type="tel" id="form-phone" required=""></div>
+                            <div class="form-group"><label>العنوان التفصيلي:</label><input type="text" id="form-address" required=""></div>
+                            <button type="submit" class="btn-submit-order">🚀 تأكيد الطلب بالواتساب</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p id="edit-footer" class="editable" contenteditable="false">© متجر قلمي للطباعة والتصميم 2026</p>
+    </footer>
+
+    <script>
+        let whatsappNumber = "9647733806611"; 
+        let telegramLink = "t.me/YOUSIIF_ALI";
+        let instagramLink = "https://www.instagram.com/qalami_designs?igsh=MTdiZHM2OW0weTZ1ZQ==";
+        let officeAddressText = "كركوك حي العسكري سايدين المعراج";
+
+        let activeEditElement = null;
+
+        // قاعدة البيانات فارغة تماماً وجاهزة لكي تضيف وتصنع قوائمك بنفسك كاملة!
+        // يتم حفظ الأسماء والمعرفات والأسعار هنا
+        let selectOptionsData = {
+    "نوع_الطباعة": [
+        {
+            "text": "خيار افتراضي مجاني (0 دينار)",
+            "value": "0",
+            "isPerPage": false
+        },
+        {
+            "text": "ديجيتال (35 دينار للوجة/الورقة)",
+            "value": "35دينار",
+            "isPerPage": true
+        },
+        {
+            "text": "ليزري (75 دينار للوجة/الورقة)",
+            "value": "75 دينار",
+            "isPerPage": true
+        },
+        {
+            "text": "زيتي (130 دينار للوجة/الورقة)",
+            "value": "130 دينار",
+            "isPerPage": true
+        }
+    ],
+    "نوع_التجميع": [
+        {
+            "text": "خيار افتراضي مجاني (0 دينار)",
+            "value": "0",
+            "isPerPage": false
+        },
+        {
+            "text": "كبس (NaN دينار للوجة/الورقة)",
+            "value": "مجانا",
+            "isPerPage": true
+        },
+        {
+            "text": "سبايرول (550 دينار ثابت)",
+            "value": "550 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "تجليد حراري (500 دينار ثابت)",
+            "value": "500 دينار",
+            "isPerPage": false
+        }
+    ],
+    "نوع_الغلاف": [
+        {
+            "text": "خيار افتراضي مجاني (0 دينار)",
+            "value": "0",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مات 180 غرام (500 دينار ثابت)",
+            "value": "500 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مات 250 غرام (650 دينار ثابت)",
+            "value": "650 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مات  300 غرام (950 دينار ثابت)",
+            "value": "950 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق غلوسي 180 غرام (550 دينار ثابت)",
+            "value": "550 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق غلوسي 250 غرام (750 دينار ثابت)",
+            "value": "750 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق غلوسي 300 غرام (1,100 دينار ثابت)",
+            "value": "1100 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مسلفن 180 غرام (700 دينار ثابت)",
+            "value": "700 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مسلفن 250 غرام (850 دينار ثابت)",
+            "value": "850 دينار",
+            "isPerPage": false
+        },
+        {
+            "text": "ورق مسلفن 300 غرام (1,750 دينار ثابت)",
+            "value": "1750 دينار",
+            "isPerPage": false
+        }
+    ]
+};
+
+        let productsData = [];
+
+        let isEditMode = false;
+        let logoClickCount = 0;
+        let logoClickTimeout;
+
+        function openPopup(id) { document.getElementById(id).style.display = 'flex'; }
+        function closePopup(id) { document.getElementById(id).style.display = 'none'; }
+
+        function updateSocialAndAddressDOM() {
+            document.getElementById('link-whatsapp').href = `https://wa.me/${whatsappNumber}`;
+            document.getElementById('link-telegram').href = telegramLink;
+            document.getElementById('link-instagram').href = instagramLink;
+            document.getElementById('display-address-text').innerText = officeAddressText;
+        }
+
+        function devEditSocialLinks() {
+            let wa = prompt("رقم الواتساب الدولي (بدون فواصل أو علامة +):", whatsappNumber);
+            let tg = prompt("رابط التلغرام الكامل:", telegramLink);
+            let ig = prompt("رابط الانستغرام الكامل:", instagramLink);
+            if(wa) whatsappNumber = wa.trim();
+            if(tg) telegramLink = tg.trim();
+            if(ig) instagramLink = ig.trim();
+            updateSocialAndAddressDOM();
+            alert("تم تحديث الروابط بنجاح!");
+        }
+
+        function devEditAddress() {
+            let addr = prompt("أدخل نص العنوان الكامل:", officeAddressText);
+            if(addr) { officeAddressText = addr.trim(); updateSocialAndAddressDOM(); }
+        }
+
+        function hideAllViews() {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('calculator-view').style.display = 'none';
+            document.getElementById('details-view').style.display = 'none';
+            closeFloatingEditor();
+        }
+
+        function showHome() { hideAllViews(); document.getElementById('home-view').style.display = 'block'; checkGridEmpty(); }
+        
+        function showCalculator() { 
+            hideAllViews(); 
+            document.getElementById('calculator-view').style.display = 'block'; 
+            renderDynamicCalculatorFields();
+            calculateTotal(); 
+        }
+        
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = "";
+            productsData.forEach(p => {
+                const cardHtml = `
+                    <div class="image-card" id="${p.id}" onclick="showDetailsView('${p.id}')">
+                        <button class="delete-card-btn" onclick="deleteCard('${p.id}', event)" style="display: ${isEditMode ? 'block' : 'none'};">🗑️</button>
+                        <img id="img-${p.id}" src="${p.img}" alt="غلاف">
+                        <button class="change-img-btn" onclick="changeImageSrc('img-${p.id}', event)" style="display: ${isEditMode ? 'block' : 'none'};">📷 تغيير الصورة</button>
+                        <h4 id="title-${p.id}" class="editable" contenteditable="${isEditMode ? 'true' : 'false'}">${p.title}</h4>
+                        <p id="teacher-${p.id}" class="card-teacher editable" contenteditable="${isEditMode ? 'true' : 'false'}">${p.teacher}</p>
+                        <p id="price-${p.id}" class="card-price editable" contenteditable="${isEditMode ? 'true' : 'false'}">${p.price}</p>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+            attachEditableListeners();
+            checkGridEmpty();
+        }
+
+        function attachEditableListeners() {
+            document.querySelectorAll('.editable').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (!isEditMode) return;
+                    e.stopPropagation();
+                    activeEditElement = element;
+                    
+                    const editor = document.getElementById('floating-editor');
+                    editor.style.display = 'flex';
+                    
+                    const rect = element.getBoundingClientRect();
+                    editor.style.top = (rect.top + window.scrollY - 55) + 'px';
+                    editor.style.left = (rect.left + window.scrollX) + 'px';
+
+                    const computedStyle = window.getComputedStyle(element);
+                    document.getElementById('editor-color').value = rgbToHex(computedStyle.color);
+                    document.getElementById('editor-bg').value = rgbToHex(computedStyle.backgroundColor);
+                    document.getElementById('editor-size').value = parseInt(computedStyle.fontSize);
+                });
+            });
+        }
+
+        function applyActiveElementStyle(property, value) {
+            if (activeEditElement) activeEditElement.style[property] = value;
+        }
+
+        function closeFloatingEditor() {
+            document.getElementById('floating-editor').style.display = 'none';
+            activeEditElement = null;
+        }
+
+        function rgbToHex(rgb) {
+            if (!rgb || rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)') return '#ffffff';
+            let parts = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if(!parts) return '#ffffff';
+            delete(parts[0]);
+            for (let i = 1; i <= 3; ++i) {
+                parts[i] = parseInt(parts[i]).toString(16);
+                if (parts[i].length == 1) parts[i] = '0' + parts[i];
+            }
+            return '#' + parts.join('');
+        }
+
+        function changeFullSiteBackgroundImage() {
+            let body = document.getElementById('main-body');
+            let currentUrl = window.getComputedStyle(body).backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+            let newUrl = prompt("أدخل رابط صورة الخلفية الجديد للموقع:", currentUrl);
+            if(newUrl && newUrl.trim() !== "") body.style.backgroundImage = `url('${newUrl.trim()}')`;
+        }
+
+        function showDetailsView(cardId) {
+            if (isEditMode) return;
+            hideAllViews();
+            const p = productsData.find(item => item.id == cardId || `card-${item.id}` == cardId);
+            
+            const titleText = p ? p.title : document.getElementById(`title-${cardId}`).innerText;
+            const teacherText = p ? p.teacher : document.getElementById(`teacher-${cardId}`).innerText;
+            const priceText = p ? p.price : document.getElementById(`price-${cardId}`).innerText;
+            const imgSrc = p ? p.img : document.getElementById(`img-${cardId}`).src;
+
+            document.getElementById('view-img').src = imgSrc;
+            document.getElementById('view-title').innerText = titleText;
+            document.getElementById('view-teacher').innerText = "الأستاذ: " + teacherText;
+            document.getElementById('view-price').innerText = "السعر: " + priceText;
+
+            const whatsappText = encodeURIComponent(`مرحباً استوديو قلمي، أريد طلب الملزمة: ${titleText} لـ ${teacherText}`);
+            document.getElementById('view-whatsapp-btn').href = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
+            document.getElementById('details-view').style.display = 'block';
+        }
+
+        function showCodSection() { document.getElementById('cod-order-section').style.display = 'block'; }
+
+        function submitCodForm(event) {
+            event.preventDefault();
+            const orderMessage = `🚨 *طلب توصيل جديد* 🚨\n\n` +
+                                 `📦 *النموذج:* ${document.getElementById('view-title').innerText}\n` +
+                                 `👤 *الاسم:* ${document.getElementById('form-name').value}\n` +
+                                 `📞 *الهاتف:* ${document.getElementById('form-phone').value}\n` +
+                                 `📍 *العنوان:* ${document.getElementById('form-address').value}`;
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderMessage)}`, '_blank');
+            showHome();
+        }
+
+        // بناء حقول الحاسبة ديناميكياً بحسب القوائم المصنوعة
+        function renderDynamicCalculatorFields() {
+            const container = document.getElementById('dynamic-calculator-fields-container');
+            container.innerHTML = "";
+
+            for (let menuId in selectOptionsData) {
+                let cleanTitle = menuId.replace(/_/g, " ");
+                let formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                let label = document.createElement('label');
+                label.textContent = cleanTitle + ":";
+                
+                let select = document.createElement('select');
+                select.id = `calc-select-${menuId}`;
+                select.setAttribute('data-menu-id', menuId);
+                select.addEventListener('change', calculateTotal);
+
+                // إضافة الخيارات البرمجية
+                selectOptionsData[menuId].forEach((opt, idx) => {
+                    let option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    // نخزن إذا كان السعر يضرب بـ عدد الصفحات أو سعر ثابت للقطعة
+                    option.setAttribute('data-per-page', opt.isPerPage ? "true" : "false");
+                    select.appendChild(option);
+                });
+
+                formGroup.appendChild(label);
+                formGroup.appendChild(select);
+                container.appendChild(formGroup);
+            }
+        }
+
+        // توليد أزرار إدارة القوائم بلوحة التحكم للمطور
+        function renderDevMenuButtons() {
+            const container = document.getElementById('dev-menus-buttons-container');
+            container.innerHTML = "";
+            
+            for (let menuId in selectOptionsData) {
+                let cleanTitle = menuId.replace(/_/g, " ");
+                let btn = document.createElement('button');
+                btn.className = 'btn-dev';
+                btn.style.background = '#1e293b';
+                btn.style.border = '1px solid #475569';
+                btn.textContent = `⚙️ إدارة: ${cleanTitle}`;
+                btn.onclick = function() { manageCalculatorMenu(menuId); };
+                container.appendChild(btn);
+            }
+        }
+
+        // إنشاء قائمة جديدة بالكامل للحاسبة
+        function createNewCalculatorMenu() {
+            let title = prompt("أدخل اسم القائمة الجديدة (مثال: نوع_الورق ، تفاصيل_السلك): \n*ملاحظة: استخدم شرطة _ بدلاً من الفراغ إذا كان الاسم من كلمتين*");
+            if (!title) return;
+            let cleanId = title.trim().replace(/\s+/g, '_');
+            
+            if (selectOptionsData[cleanId]) {
+                alert("❌ هذه القائمة موجودة بالفعل!");
+                return;
+            }
+
+            selectOptionsData[cleanId] = [
+                { text: "خيار افتراضي مجاني (0 دينار)", value: "0", isPerPage: false }
+            ];
+            
+            renderDevMenuButtons();
+            renderDynamicCalculatorFields();
+            alert("✅ تم إنشاء القائمة بنجاح! يمكنك الآن الضغط على زر إدارتها لإضافة الخيارات الفنية والأسعار بداخلها.");
+        }
+
+        // حذف قائمة بالكامل
+        function deleteCalculatorMenu() {
+            let list = "اكتب اسم القائمة المراد حذفها نهائياً بالكامل:\n";
+            for (let mId in selectOptionsData) { list += `- ${mId}\n`; }
+            let target = prompt(list);
+            if (target && selectOptionsData[target]) {
+                if (confirm(`هل أنت متأكد من حذف قائمة [ ${target} ] وكل الخيارات اللي بداخلها نهائياً؟`)) {
+                    delete selectOptionsData[target];
+                    renderDevMenuButtons();
+                    renderDynamicCalculatorFields();
+                    calculateTotal();
+                    alert("🗑️ تم مسح القائمة بالكامل.");
+                }
+            } else if (target) {
+                alert("❌ الاسم غير صحيح!");
+            }
+        }
+
+        // التحكم الداخلي بكل قائمة (إضافة خيار، تعديل خيار، مسح خيار)
+        function manageCalculatorMenu(menuId) {
+            let cleanTitle = menuId.replace(/_/g, " ");
+            let promptMsg = `📊 التحكم بقائمة [ ${cleanTitle} ]:\n\n`;
+            promptMsg += `اكتب (1) لإضافة خيار / سعر جديد بداخلها\n`;
+            promptMsg += `اكتب (2) لتعديل أو حذف خيار موجود حالياً بداخلها\n`;
+            
+            let action = prompt(promptMsg);
+            
+            if (action === "1") {
+                let name = prompt("أدخل اسم الخيار الجديد (مثال: ورق كوشيه 150 غم):");
+                let price = prompt("أدخل السعر الرقمي الصافي للحسابات (مثال: 500 أو 25):");
+                let perPageInput = prompt("هل هذا السعر يحتسب لـ (كل ورقة بالملزمة)؟\nاكتب ( نعم ) إذا كان سعر للورقة الواحدة.\nاكتب ( لا ) إذا كان سعراً ثابتاً يضاف مرة واحدة للملزمة.");
+                
+                if (name && price) {
+                    let isPage = (perPageInput === "نعم" || perPageInput === "1") ? true : false;
+                    selectOptionsData[menuId].push({
+                        text: `${name} (${parseInt(price).toLocaleString()} دينار ${isPage ? 'للوجة/الورقة' : 'ثابت'})`,
+                        value: price.trim(),
+                        isPerPage: isPage
+                    });
+                    alert("✅ تم إضافة الخيار الفني الجديد بنجاح!");
+                }
+            } else if (action === "2") {
+                let listMsg = `اختر رقم العنصر لإدارته:\n`;
+                selectOptionsData[menuId].forEach((opt, idx) => { listMsg += `[${idx + 1}] - ${opt.text}\n`; });
+                let choice = parseInt(prompt(listMsg)) - 1;
+                
+                if (choice >= 0 && choice < selectOptionsData[menuId].length) {
+                    let subAction = prompt(`العنصر المختار: ${selectOptionsData[menuId][choice].text}\n\nاكتب (1) لتعديل الاسم والسعر بالكامل\nاكتب (2) لحذفه نهائياً من هذه القائمة`);
+                    
+                    if (subAction === "1") {
+                        let nText = prompt("أدخل الاسم الجديد والوصف مع كتابة السعر نصياً:", selectOptionsData[menuId][choice].text);
+                        let nVal = prompt("أدخل السعر الرقمي الصافي الجديد للحسابات:", selectOptionsData[menuId][choice].value);
+                        let perPageInput = prompt("هل يحتسب لـ (كل ورقة بالملزمة)؟\nاكتب ( نعم ) أو ( لا )", selectOptionsData[menuId][choice].isPerPage ? "نعم" : "لا");
+                        
+                        if (nText && nVal) {
+                            selectOptionsData[menuId][choice].text = nText;
+                            selectOptionsData[menuId][choice].value = nVal.trim();
+                            selectOptionsData[menuId][choice].isPerPage = (perPageInput === "نعم") ? true : false;
+                            alert("✅ تم التحديث بنجاح!");
+                        }
+                    } else if (subAction === "2") {
+                        if (confirm("هل أنت متأكد من مسح هذا الخيار؟")) {
+                            selectOptionsData[menuId].splice(choice, 1);
+                            alert("🗑️ تم حذف الخيار.");
+                        }
+                    }
+                }
+            }
+            renderDynamicCalculatorFields();
+            calculateTotal();
+        }
+
+        // الحسابات الرياضية الذكية التلقائية لأي قائمة يتم تصنيعها
+        function calculateTotal() {
+            const pages = parseInt(document.getElementById('page-count').value) || 0;
+            const quantity = parseInt(document.getElementById('book-count').value) || 0;
+            
+            const faceSelector = document.querySelector('input[name="page-face"]:checked').value;
+            let actualPapers = pages;
+            if (faceSelector === "2") {
+                actualPapers = Math.ceil(pages / 2);
+            }
+            
+            document.getElementById('calculated-papers-count').textContent = actualPapers + " ورقة";
+
+            let perBookCost = 0;
+
+            // حلقة برمجية تدور على كل القوائم الديناميكية اللي صنعها المطور وتجمع أسعارها كلياً
+            for (let menuId in selectOptionsData) {
+                const selectEl = document.getElementById(`calc-select-${menuId}`);
+                if (selectEl && selectEl.options.length > 0) {
+                    let selectedOpt = selectEl.options[selectEl.selectedIndex];
+                    let price = parseInt(selectedOpt.value) || 0;
+                    let isPerPage = selectedOpt.getAttribute('data-per-page') === "true";
+
+                    if (isPerPage) {
+                        perBookCost += (actualPapers * price);
+                    } else {
+                        perBookCost += price;
+                    }
+                }
+            }
+
+            const totalOrderCost = perBookCost * quantity;
+
+            document.getElementById('single-total-cost').textContent = perBookCost.toLocaleString() + " دينار";
+            document.getElementById('final-total-cost').textContent = totalOrderCost.toLocaleString() + " دينار";
+        }
+
+        function handleLogoClick() {
+            logoClickCount++;
+            clearTimeout(logoClickTimeout);
+            if (logoClickCount === 3) {
+                if (prompt("أدخل الرمز السري لوضع المطور:") === "YAX2") enterEditMode();
+            }
+            logoClickTimeout = setTimeout(() => { logoClickCount = 0; }, 1000);
+        }
+
+        function enterEditMode() {
+            isEditMode = true;
+            document.getElementById('main-body').classList.add('dev-mode-active');
+            document.getElementById('dev-controls').style.display = 'block';
+            document.querySelectorAll('.change-img-btn, .delete-card-btn').forEach(b => b.style.display = 'block');
+            document.querySelectorAll('.editable').forEach(el => el.contentEditable = "true");
+            renderDevMenuButtons();
+            attachEditableListeners();
+        }
+
+        function exitEditMode() {
+            isEditMode = false;
+            document.getElementById('main-body').classList.remove('dev-mode-active');
+            document.getElementById('dev-controls').style.display = 'none';
+            document.querySelectorAll('.change-img-btn, .delete-card-btn').forEach(b => b.style.display = 'none');
+            document.querySelectorAll('.editable').forEach(el => el.contentEditable = "false");
+            closeFloatingEditor();
+            syncDOMToProductsArray();
+        }
+
+        function addNewProductFast() {
+            const t = prompt("الاسم:"), a = prompt("الأستاذ:"), p = prompt("السعر:"), i = prompt("الصورة:");
+            productsData.push({ id: Date.now(), title: t || 'ملزمة جديدة', teacher: a || 'الأستاذ', price: p || '0 دينار', img: i || 'https://via.placeholder.com/260x180' });
+            renderGallery();
+        }
+
+        function changeImageSrc(id, e) {
+            e.stopPropagation();
+            let src = prompt("رابط الصورة الجديد:", document.getElementById(id).src);
+            if(src) document.getElementById(id).src = src;
+        }
+
+        function deleteCard(id, e) {
+            e.stopPropagation();
+            if(confirm("هل أنت متأكد من حذف هذا النموذج؟")) { productsData = productsData.filter(p => p.id != id); renderGallery(); }
+        }
+
+        function checkGridEmpty() {
+            const g = document.getElementById('gallery-grid');
+            if (g.children.length === 0) g.innerHTML = `<div class="no-items-msg">الموقع جاهز للتصميم 🖋️ اضغط 3 مرات على "قلمي" لفتح الإعدادات وصنع الحاسبة والأسعار.</div>`;
+        }
+
+        function syncDOMToProductsArray() {
+            let current = [];
+            document.querySelectorAll('#gallery-grid .image-card').forEach((c, i) => {
+                current.push({
+                    id: c.id,
+                    title: c.querySelector('h4').innerText,
+                    teacher: c.querySelector('.card-teacher').innerText,
+                    price: c.querySelector('.card-price').innerText,
+                    img: c.querySelector('img').src
+                });
+            });
+            productsData = current;
+        }
+
+        function downloadUpdatedHTML() {
+            exitEditMode();
+            syncDOMToProductsArray();
+            let html = document.documentElement.outerHTML;
+            
+            html = html.replace(/let whatsappNumber\s*=\s*".*?";/, `let whatsappNumber = "${whatsappNumber}";`);
+            html = html.replace(/let telegramLink\s*=\s*".*?";/, `let telegramLink = "${telegramLink}";`);
+            html = html.replace(/let instagramLink\s*=\s*".*?";/, `let instagramLink = "${instagramLink}";`);
+            html = html.replace(/let officeAddressText\s*=\s*".*?";/, `let officeAddressText = "${officeAddressText}";`);
+            
+            html = html.replace(/let selectOptionsData\s*=\s*\{[\s\S]*?\};/, `let selectOptionsData = ${JSON.stringify(selectOptionsData, null, 4)};`);
+            html = html.replace(/let productsData\s*=\s*\[[\s\S]*?\];/, `let productsData = ${JSON.stringify(productsData, null, 4)};`);
+
+            const blob = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'qalami-store.html';
+            link.click();
+        }
+
+        window.onload = function() {
+            updateSocialAndAddressDOM();
+            renderDynamicCalculatorFields();
+            renderGallery();
+        };
+    </script>
+
+</body></html>
